@@ -12,18 +12,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
 #include <locale.h>
 #include <math.h>
+#include <limits.h>
 
 /* Vértices de grafos são representados por objetos do tipo vertex. */ 
 #define vertex int
-#define MAXV 101
-#define inf 10000
-
-const double INF = HUGE_VAL;
-
+#define INF INT_MAX
 
 /* REPRESENTAÇÃO POR MATRIZ DE ADJACÊNCIAS: A estrutura graph representa um grafo. 
 	O campo adj é um ponteiro para a matriz de adjacências do grafo. 
@@ -65,7 +63,7 @@ Graph GRAPHinit( int V) {
    Graph G = malloc( sizeof *G);
    G->V = V; 
    G->A = 0;
-   G->adj = MATRIXint( V, V, inf);
+   G->adj = MATRIXint( V, V, INF);
    return G;
 }
 
@@ -73,7 +71,7 @@ Graph GRAPHinit( int V) {
 A função supõe que v e w são distintos, positivos e menores que G->V. Se o grafo já tem um arco v-w, a função não faz nada. */
 
 void GRAPHinsertArc( Graph G, vertex v, vertex w, int c) { 
-   if (G->adj[v][w] == inf) {
+   if (G->adj[v][w] == INF) {
       G->adj[v][w] = c; 
       G->A++;
    }
@@ -82,7 +80,7 @@ void GRAPHinsertArc( Graph G, vertex v, vertex w, int c) {
 /* REPRESENTAÇÃO POR MATRIZ DE ADJACÊNCIAS: A função GRAPHremoveArc() remove do grafo G o arco v-w.
 A função supõe que v e w são distintos, positivos e menores que G->V. Se não existe arco v-w, a função não faz nada. */
 void GRAPHremoveArc( Graph G, vertex v, vertex w) { 
-   if (G->adj[v][w] != inf) {
+   if (G->adj[v][w] != INF) {
       G->adj[v][w] = -1; 
       G->A--;
    }
@@ -95,7 +93,7 @@ void GRAPHshow( Graph G) {
    for (v = 1; v <= G->V; ++v) {
       printf( "%2d:", v);
       for (w = 1; w <= G->V; ++w)
-         if (G->adj[v][w] != inf) 
+         if (G->adj[v][w] != INF) 
             printf( " %2d", w);
       printf( "\n");
    }
@@ -104,65 +102,111 @@ void GRAPHshow( Graph G) {
    
    for (v = 1; v <= G->V; ++v) {
       for (w = 1; w <= G->V; ++w)
-         if (G->adj[v][w] != inf){
+         if (G->adj[v][w] != INF){
             printf("Arco: %2d->%2d Custo: %2d", v, w, G->adj[v][w]);
 			printf("\n");
 		}
    }
 }
 
-void Dijkstra (Graph G, int s){ //recebe a origem, aqui chamada de Vi
-	int t, i, x;
-	char vis[G->V+1]; 	//o vetor de visitados, que vai dizer se já passamos pelo vértice em questão(0 para não visitado ou 1 para visitado)
-	int dis[G->V+1]; //um vetor que vai guardar as distâncias da origem até todos os vértices do grafo
-	int path[G->V+1]; //o vetor que vai guardar o caminho pra chegar da origem até o destino
-    for (x=1; x<=G->V; ++x){
-    	dis[x] = inf;  
-    	vis[x] = 0; // inicializa todo o vetor vis com 0 (ninguém foi visitado ainda)
-    }
-    dis[s] = 0; // a distância da origem até ela mesma é 0
-    path[s] = -1; //o caminho pra chegar da origem até ela mesma é -1, pra servir como condição de parada para a função mostraCaminho
-    for (t = 1; t <= G->A; t++){
-    	printf("Distancias no inicio da iteração: ");
-    	for (x = 1; x <= G->V; ++x) {
-        	printf("%d ", dis[x]);	
-    	}
-    	printf("\n");
-    	
-        int v = -1; //inicializa a variável v, que será usada para percorrer o grafo
-        for (i = 1; i <= G->A; i++) 
-            if (!vis[i] && (v < 0 || dis[i] < dis[v])) //se i não foi visitado e 
-                v = i;
-        vis[v] = 1; //marca o vértice v como visitado
-        for (i = 1; i <= G->A; i++)  //laço que verifica as ligações do vértice v e escolhe a que tem o menor custo pra guardar no vetor dis
-            if (G->adj[v][i] && dis[i] > dis[v] + G->adj[v][i]){
-                dis[i] = dis[v] + G->adj[v][i];
-                path[i]  = v;
-            }
-           
-		
-		printf("Distancias no final da iteração: ");
-    	for (x = 1; x <= G->V; ++x) {
-        	printf("%2d ", dis[x]);	
-    	}
-    	printf("\n");
-    }
-    
-    
-    
-
-}
-
-void mostraCaminho(int path[], int j){ 
-    if (path[j]== -1) //a condição de parada é quando path[j] = -1, ou seja, quando chegar em path[0], que é a origem
+int minDistance(Graph G, int dist[], bool Z[]) 
+{ 
+   // Initialize min value 
+   int min = INF, min_index; 
+   int v;
+   for (v = 1; v <= G->V; v++) 
+     if (Z[v] == false && dist[v] <= min) 
+         min = dist[v], min_index = v; 
+   
+   return min_index; 
+} 
+   
+   
+void printPath(int anterior[], int j) 
+{ 
+    if (anterior[j] == - 1){
+    	printf("%d ", j);  
         return;
-
-    mostraCaminho(path, path[j]); //chama recursivamente a função mostraCaminho pra ir retornando do último vértice do caminho até o primeiro, que é a origem
-
+	}
+    printPath(anterior, anterior[j]); 
+    
     printf("%d ", j); 
+} 
+   
+// A utility function to print the constructed distance array 
+int printSolution(int dist[], int n, int anterior[], int s, int t) 
+{ 
+    printPath(anterior, t); 
+} 
 
-}
 
+int printDistances(int dist[], bool Z[], int anterior[], int n) 
+{ 
+	int i;
+   	printf("\nDistâncias\n"); 
+   	for (i = 1; i <= n; i++) 
+     	printf("%d ", dist[i]); 
+	printf("\n");
+	
+	printf("Vetor Z\n"); 
+   	for (i = 1; i <= n; i++) 
+     	printf("%d ", Z[i]); 
+	printf("\n");
+	
+	printf("Anterior\n"); 
+   	for (i = 1; i <= n; i++) 
+     	printf("%d ", anterior[i]); 
+	printf("\n");
+} 
+   
+// Function that implements Dijkstra's single source shortest path algorithm 
+// for a graph represented using adjacency matrix representation 
+void Dijkstra(Graph G, int s, int t) 
+{ 
+	int dist[(G->V)+1];     
+	bool Z[(G->V)+1]; 
+	int anterior[(G->V)+1]; 
+	
+	int i, j, v;
+	// Initialize all distances as INFINITE and stpSet[] as false 
+	for (i = 1; i <= G->V; i++){
+		anterior[i] = -1; 
+		dist[i] = INF, Z[i] = false; 
+	}
+	
+	// Distance of source vertex from itself is always 0 
+	dist[s] = 0; 
+	
+	// Find shortest path for all vertices 
+	for (j = 1; j <= G->V; j++) { 
+		
+	// Pick the minimum distance vertex from the set of vertices not 
+	// yet processed. u is always equal to src in the first iteration. 
+		int u = minDistance(G, dist, Z); 
+		printf("\nNo início da iteração sobre o vértice %d:", u);
+		printDistances(dist, Z, anterior,G->V);
+		// Mark the picked vertex as processed 
+		Z[u] = true; 
+		
+		// Update dist value of the adjacent vertices of the picked vertex. 
+		for (v = 1; v <= G->V; v++){
+		 // Update dist[v] only if is not in sptSet, there is an edge from  
+		 // u to v, and total weight of path from src to  v through u is  
+		 // smaller than current value of dist[v] 
+			if (!Z[v] && G->adj[u][v] != INF && dist[u] != INF && dist[u]+G->adj[u][v] < dist[v]){
+				anterior[v] = u; 
+		    	dist[v] = dist[u] + G->adj[u][v]; 
+			}
+		}
+		
+		printf("\nAo final da iteração:");
+		printDistances(dist, Z, anterior, G->V);
+	} 
+	
+	
+	printf("O custo mínimo de %d a %d é: %d\n", s, t, dist[t]);
+	printSolution(dist, G->V, anterior, s ,t); 
+} 
 
 void leituraArquivo(){
     /**   Lê o nome do arquivo e, ao localizá-lo, lê o grafo contido no mesmo,
@@ -236,17 +280,8 @@ void leituraArquivo(){
         
         GRAPHshow(G);
        
-        Dijkstra(G, s); /*chama a função dijkstra passando o vértice origem, o que vai nos devolver o custo mínimo 
+        Dijkstra(G, s, t); /*chama a função dijkstra passando o vértice origem, o que vai nos devolver o custo mínimo 
 						pra sair da origem e chegar em todos os outros vértices */
-//	    if( dis[t] >= INF) //se o custo mínimo da origem até o destino for infinito, então não existe ligação entre origem e destino
-//	        printf("\nNão existe caminho de %d até %d.\n", s, t); 
-//	    else{  //se não for infinito, mostra na tela o custo mínimo da origem até o destino
-//	        printf("\nO menor tempo de %d até %d é: %d\n", s,t,dis[t]);
-////	        printf("Caminho: ");
-////	        mostraCaminho(path, t); //printa o caminho pra chegar da origem até o destino
-////	        printf("\n");
-//	    }
-        
         fclose(file); //Fecha o arquivo
 	}
 }
