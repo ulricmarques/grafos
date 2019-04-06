@@ -44,14 +44,14 @@ void limpaTela(){
     #endif
 }
 
-/* REPRESENTAÇÃO POR MATRIZ DE ADJACÊNCIAS: A função alocaMatriz() aloca uma matriz com linhas 1..r e colunas 1..c. 
+/* REPRESENTAÇÃO POR MATRIZ DE ADJACÊNCIAS: A função alocaMatriz() aloca uma matriz com linhas 1..l e colunas 1..c. 
 Cada elemento da matriz recebe valor val. */
-static int **alocaMatriz( int r, int c, int val) { 
+static int **alocaMatriz( int l, int c, int val) { 
    vertice i, j;
-   int **m = malloc( r * sizeof (int *));
-   for (i = 1; i <= r; ++i) 
+   int **m = malloc( l * sizeof (int *));
+   for (i = 1; i <= l; ++i) 
       m[i] = malloc( c * sizeof (int));
-   for (i = 1; i <= r; ++i)
+   for (i = 1; i <= l; ++i)
       for (j = 1; j <= c; ++j)
          m[i][j] = val;
    return m;
