@@ -6,7 +6,7 @@
  *   EQUIPE:
  *       - Cláudia Mariana Costa Maia
  *       - Jorge Girão Limaverde Lima
- *		 - Thalia Nascimento de Sousa Freitas
+ *	 - Thalia Nascimento de Sousa Freitas
  *       - Ulric Marques Ferreira
  */
 
@@ -16,7 +16,6 @@
 #include <ctype.h>
 #include <string.h>
 #include <locale.h>
-#include <math.h>
 #include <limits.h>
 
 /* Vértices de grafos são representados por objetos do tipo vertice. */ 
@@ -90,6 +89,7 @@ void removeArco( Grafo G, vertice v, vertice w) {
 em uma linha, todos os vértices adjacentes a v, além dos custos de cada arco. */
 void mostraGrafo( Grafo G) { 
    vertice v,w;
+   printf( "\n");
    for (v = 1; v <= G->V; ++v) {
       printf( "%2d:", v);
       for (w = 1; w <= G->V; ++w)
@@ -193,8 +193,9 @@ void Dijkstra(Grafo G, int s, int t)
 	} 
 	
 	
-	printf("O custo mínimo de %d a %d é: %d\n", s, t, dist[t]);
+	printf("\nO custo mínimo de %d a %d é: %d\n", s, t, dist[t]);
 	mostraSolucao(dist, G->V, anterior, s ,t); 
+	system("pause");
 } 
 
 void leituraArquivo(){
@@ -218,8 +219,7 @@ void leituraArquivo(){
     Grafo G;
 
     /* Variáveis auxiliares */
-    int i=1, j=1;
-    int aux=0; //Variável auxiliar, para ler a primeira linha do arquivo
+    int i=0;
     
     nomeArquivo = malloc(sizeof(char)*35); /* Aloca string com até 35 caracteres (valor arbitrário) */
 
@@ -249,21 +249,15 @@ void leituraArquivo(){
     else{
         printf("\n\tArquivo: %s\t",nomeArquivo);
 
-        while(!feof(file)){ /* Lê os dados do arquivo enquanto não chega no final do mesmo */
-            if(aux==0){
-                fscanf(file,"%d %d %d %d",&n, &m, &s, &t); //Lê a primeira linha do arquivo, contendo n, m, s e t.
-                G = inicializaGrafo(n);
-
-                printf("Numero de vertices: %d\n",n);
-                aux++; //Atualiza 'aux', para que este laço não seja mais executado nas próximas iterações.
-
-            } else{
-                /* Lê uma aresta do grafo */
-                fscanf(file,"%d %d %d",&v, &w, &c);
-                insereArco(G, v, w, c);
-                //v = 0; w = 0; c = 0;  //Reinicialização da variável, para receber novo valor na próxima iteração.
-                setbuf(stdin,NULL);
-            }
+		fscanf(file,"%d %d %d %d",&n, &m, &s, &t); //Lê a primeira linha do arquivo, contendo n, m, s e t.
+		printf("\nVértices: %d\tArcos: %d\t Origem: %d\t Destino: %d\n", n, m, s, t);
+    	G = inicializaGrafo(n);
+        while(i < m){ /* Lê as próximas m linhas contendo os arcos do grafo */
+            /* Lê um arco do grafo */
+            fscanf(file,"%d %d %d",&v, &w, &c);
+            insereArco(G, v, w, c);
+            i++;
+            setbuf(stdin,NULL);
         }
         
         mostraGrafo(G);
