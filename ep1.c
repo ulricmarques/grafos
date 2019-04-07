@@ -12,7 +12,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
 #include <locale.h>
@@ -48,9 +47,9 @@ void limpaTela(){
 Cada elemento da matriz recebe valor val. */
 static int **alocaMatriz( int l, int c, int val) { 
    vertice i, j;
-   int **m = malloc( l * sizeof (int *));
+   int **m = malloc( (l+1) * sizeof (int *));
    for (i = 1; i <= l; ++i) 
-      m[i] = malloc( c * sizeof (int));
+      m[i] = malloc( (c+1) * sizeof (int));
    for (i = 1; i <= l; ++i)
       for (j = 1; j <= c; ++j)
          m[i][j] = val;
@@ -109,36 +108,31 @@ void mostraGrafo( Grafo G) {
    }
 }
 
-int distanciaMinima(Grafo G, int dist[], bool Z[]) 
+int distanciaMinima(Grafo G, int dist[], int Z[]) 
 { 
    int minimo = INF, indiceMenorValor; 
    int v;
    for (v = 1; v <= G->V; v++) 
-     if (Z[v] == false && dist[v] <= minimo) 
+     if (Z[v] == 0 && dist[v] <= minimo) 
          minimo = dist[v], indiceMenorValor = v; 
    
    return indiceMenorValor; 
 } 
    
    
-void mostraCaminho(int anterior[], int j) 
+void mostraCaminho(int anterior[], int t) 
 { 
-    if (anterior[j] == - 1){
-    	printf("%d ", j);  
+    if (anterior[t] == - 1){
+    	printf("%d ", t);  
         return;
 	}
-    mostraCaminho(anterior, anterior[j]); 
+    mostraCaminho(anterior, anterior[t]); 
     
-    printf("%d ", j); 
+    printf("%d ", t); 
 } 
    
-int mostraSolucao(int dist[], int n, int anterior[], int s, int t) 
-{ 
-    mostraCaminho(anterior, t); 
-} 
 
-
-int mostraDistancias(int dist[], bool Z[], int anterior[], int n) 
+int mostraDistancias(int dist[], int Z[], int anterior[], int n) 
 { 
 	int i;
    	printf("\nDistâncias\n"); 
@@ -161,14 +155,14 @@ int mostraDistancias(int dist[], bool Z[], int anterior[], int n)
 void Dijkstra(Grafo G, int s, int t) 
 { 
 	int dist[(G->V)+1];     
-	bool Z[(G->V)+1]; 
+	int Z[(G->V)+1]; 
 	int anterior[(G->V)+1]; 
 	
 	int i, j, v;
 	
 	for (i = 1; i <= G->V; i++){
 		anterior[i] = -1; 
-		dist[i] = INF, Z[i] = false; 
+		dist[i] = INF, Z[i] = 0; 
 	}
 	
 	dist[s] = 0; 
@@ -178,7 +172,7 @@ void Dijkstra(Grafo G, int s, int t)
 		int u = distanciaMinima(G, dist, Z); 
 //		printf("\nNo início da iteração sobre o vértice %d:", u);
 //		mostraDistancias(dist, Z, anterior,G->V);
-		Z[u] = true; 
+		Z[u] = 1; 
 		
 		for (v = 1; v <= G->V; v++){
  
@@ -194,8 +188,15 @@ void Dijkstra(Grafo G, int s, int t)
 	
 	
 	printf("\nO custo mínimo de %d a %d é: %d\n", s, t, dist[t]);
-	mostraSolucao(dist, G->V, anterior, s ,t); 
-	system("pause");
+	mostraCaminho(anterior, t); 
+	
+	
+	/* Espera o usuario pressionar uma tecla para voltar ao menu principal */
+    printf("\n\n[i] Pressione <ENTER> para voltar ao MENU DE OPCOES...");
+    setbuf(stdin,NULL);
+    getchar();
+    
+
 } 
 
 void leituraArquivo(){
