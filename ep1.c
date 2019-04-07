@@ -123,35 +123,15 @@ int distanciaMinima(Grafo G, int dist[], int Z[])
 void mostraCaminho(int anterior[], int t) 
 { 
     if (anterior[t] == - 1){
-    	printf("%d ", t);  
+    	printf("\nCaminho: ");
         return;
 	}
+	
     mostraCaminho(anterior, anterior[t]); 
-    
-    printf("%d ", t); 
+    printf("(%d %d) ", anterior[t], t); 
 } 
    
 
-int mostraDistancias(int dist[], int Z[], int anterior[], int n) 
-{ 
-	int i;
-   	printf("\nDistâncias\n"); 
-   	for (i = 1; i <= n; i++) 
-     	printf("%d ", dist[i]); 
-	printf("\n");
-	
-	printf("Vetor Z\n"); 
-   	for (i = 1; i <= n; i++) 
-     	printf("%d ", Z[i]); 
-	printf("\n");
-	
-	printf("Anterior\n"); 
-   	for (i = 1; i <= n; i++) 
-     	printf("%d ", anterior[i]); 
-	printf("\n");
-} 
-   
- 
 void Dijkstra(Grafo G, int s, int t) 
 { 
 	int dist[(G->V)+1];     
@@ -170,8 +150,6 @@ void Dijkstra(Grafo G, int s, int t)
 	for (j = 1; j <= G->V; j++) { 
 		
 		int u = distanciaMinima(G, dist, Z); 
-//		printf("\nNo início da iteração sobre o vértice %d:", u);
-//		mostraDistancias(dist, Z, anterior,G->V);
 		Z[u] = 1; 
 		
 		for (v = 1; v <= G->V; v++){
@@ -182,12 +160,10 @@ void Dijkstra(Grafo G, int s, int t)
 			}
 		}
 		
-//		printf("\nAo final da iteração:");
-//		mostraDistancias(dist, Z, anterior, G->V);
 	} 
 	
 	
-	printf("\nO custo mínimo de %d a %d é: %d\n", s, t, dist[t]);
+	printf("\nO custo mínimo do vértice %d ao vértice %d é: %d\n", s, t, dist[t]);
 	mostraCaminho(anterior, t); 
 	
 	
@@ -263,8 +239,8 @@ void leituraArquivo(){
         
         mostraGrafo(G);
        
-        Dijkstra(G, s, t); /*chama a função dijkstra passando o vértice origem, o que vai nos devolver o custo mínimo 
-						pra sair da origem e chegar em todos os outros vértices */
+        Dijkstra(G, s, t); /*chama a função Dijkstra passando o vértice s(origem) e o vértice t(destino), 
+						o que vai nos devolver o custo mínimo para sair de s e chegar em t. */
         fclose(file); //Fecha o arquivo
 	}
 }
