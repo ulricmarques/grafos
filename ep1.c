@@ -207,7 +207,7 @@ void leituraArquivo(){
     }
     setbuf(stdin,NULL);
     printf("Digite o nome do arquivo de texto (SEM SUA EXTENSAO): ");
-    gets(nomeArquivo);   //Lê o nome do arquivo;
+    scanf(" %s", nomeArquivo);   //Lê o nome do arquivo;
 
     strcat(nomeArquivo,".txt\0"); //Adiciona a extensão '.txt' mais caractere '\0' (final da string) ao nome do arquivo;
 
