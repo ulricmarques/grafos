@@ -62,6 +62,7 @@ int **alocaMatriz(int l, int c, int val) {
 	
    	for (i = 1; i <= l; ++i){
 		m[i] = malloc((c+1) * sizeof (int));
+		
 		if (m[i] == NULL){
 			for (j = 1; j <= i; ++j){
 				free(m[j]);
@@ -84,15 +85,19 @@ int **alocaMatriz(int l, int c, int val) {
 /* A função inicializaGrafo() constrói um grafo com vértices 1,2,...,V e nenhum arco. */
 Grafo inicializaGrafo(int V) { 
 	Grafo G = malloc(sizeof *G);
+	
 	if(G == NULL){
 		return NULL;
 	}
+	
 	G->V = V; 
 	G->A = 0;
 	G->adj = alocaMatriz(V, V, INF);
+
 	if(G->adj == NULL){
 		return NULL;
 	}
+	
 	return G;
 }
 
@@ -131,7 +136,7 @@ void mostraGrafo(Grafo G) {
    }
 }
 
-/* A função distanciaMinima encontra um vértice da fronteira de Z
+/* A função auxiliar distanciaMinima() encontra um vértice da fronteira de Z
 cuja distância à origem seja mínima.*/
 int distanciaMinima(Grafo G, int dist[], int Z[]) 
 { 
@@ -146,7 +151,8 @@ int distanciaMinima(Grafo G, int dist[], int Z[])
 	return indiceMenorValor; 
 } 
    
-   
+/* A função caminhoMinimo() constrói o caminho de custo mínimo do vértice origem
+ao vértice t, que foi calculado pelo algoritmo de Dijkstra, a partir do vetor anterior[]. */   
 void mostraCaminho(int anterior[], int t) 
 { 
 	if (anterior[t] == - 1){
@@ -158,30 +164,47 @@ void mostraCaminho(int anterior[], int t)
 	printf("(%d %d) ", anterior[t], t); 
 } 
    
-
+/* Recebe um grafo G com custos positivos nos arcos, um vértice s e um vértice t. 
+Calcula e exibe um caminho de custo mínimo do vértice s ao vértice t, bem como o
+seu custo. */ 
 void Dijkstra(Grafo G, int s, int t) 
 {
-
-	int dist[(G->V)+1];     
-	int Z[(G->V)+1]; 
-	int anterior[(G->V)+1]; 
+	/* O vetor dist[] guarda as distâncias mínimas dos vérticesem relação à origem.*/
+	vertice dist[(G->V)+1]; 
 	
-	int i, j, v;
+	/* Z[i] terá valor 1 se a distância mínima entre o vértice s e o vértice i
+	já tiver sido calculada. Caso contrário, Z[i] terá valor 0.*/    
+	vertice Z[(G->V)+1]; 
 	
+	/* O vetor anterior[] é usado para reconstruir o caminho mínimo de s a t.
+	anterior[i] guarda o vértice w que forma o arco w-i. */
+	vertice anterior[(G->V)+1]; 
+	
+	int i, j;
+	vertice v;
+	
+	/* Inicialização dos vetores */
 	for (i = 1; i <= G->V; i++){
 		anterior[i] = -1; 
 		dist[i] = INF, Z[i] = 0; 
 	}
 	
+	/* A distância entre o vértice s e ele mesmo é 0. */
 	dist[s] = 0; 
 	
+	/* Laço principal*/
 	for (j = 1; j <= G->V; j++) { 
 		
+		/* Escolhe um vértice u na fronteira de Z tal que dist[u] é mínimo. */
 		int u = distanciaMinima(G, dist, Z); 
+		
+		/* A distância mínima de s a u já foi calculada, 
+		então o vértice passa a fazer parte de Z. */
 		Z[u] = 1; 
 		
+		/* A fronteira de Z mudou, então é preciso atualizar os vetores 
+		distancia[] e anterior[]. */
 		for (v = 1; v <= G->V; v++){
- 
 			if (!Z[v] && G->adj[u][v] != INF && dist[u] != INF && dist[u]+G->adj[u][v] < dist[v]){
 				anterior[v] = u; 
 				dist[v] = dist[u] + G->adj[u][v]; 
@@ -190,14 +213,22 @@ void Dijkstra(Grafo G, int s, int t)
 		
 	} 
 	
-
-	printf("\nO custo mínimo do vértice %d ao vértice %d é: %d\n", s, t, dist[t]);
-	mostraCaminho(anterior, t); 
+	/* Finalmente, mostra o caminho mínimo retornado pelo algoritmo
+	de Dijkstra e também seu custo, se tal caminho existir. Caso contrário,
+	exibe uma mensagem dizendo que não existe caminho entre s e t. */
+	if(dist[t] != INF){
+		printf("\nO custo mínimo do vértice %d ao vértice %d é: %d\n", s, t, dist[t]);
+		mostraCaminho(anterior, t); 
+	}
+	else{
+		printf("\nNão existe caminho entre o vértice %d e o vértice %d.\n", s, t);
+	}
+	
 	
 } 
 
 
-/*  A funão caminhoMinimo lê o nome de um arquivo e, ao localizá-lo, lê o grafo contido no mesmo,
+/*  A função caminhoMinimo() lê o nome de um arquivo e, ao localizá-lo, lê o grafo contido no mesmo,
 bem como os custos de seus arcos, e encontra um caminho de custo mínimo entre um vértice origem
 e um vértice destino utilizando o algoritmo de Dijkstra. */
 void caminhoMinimo(){
@@ -286,7 +317,7 @@ void caminhoMinimo(){
 }
 
 
-/* A função menuDeOpcoes exibe o menu de opções, lê a opção escolhida pelo usuário e a retorna. */
+/* A função menuDeOpcoes() exibe o menu de opções, lê a opção escolhida pelo usuário e a retorna. */
 char menuDeOpcoes(){
     
 
