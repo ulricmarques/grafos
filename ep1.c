@@ -27,8 +27,8 @@ para indicar que não é possível chegar a um vértice partindo da origem. */
 #define INF INT_MAX
 
 /* A estrutura 'grafo' representa um grafo. 
-	 O campo 'adj' é um ponteiro para a matriz de adjacências do grafo. 
-	 O campo 'V' contém o número de vértices e o campo 'A' contém o número de arcos do grafo. */
+O campo 'adj' é um ponteiro para a matriz de adjacências do grafo. 
+O campo 'V' contém o número de vértices e o campo 'A' contém o número de arcos do grafo. */
 	struct grafo {
 	   int V; 
 	   int A; 
@@ -50,35 +50,60 @@ void limpaTela(){
 	#endif
 }
 
-/* A função alocaMatriz() aloca uma matriz com linhas 1,2,...,l e colunas 1..c. 
-Cada elemento da matriz recebe valor val. */
-static int **alocaMatriz(int l, int c, int val) { 
-   vertice i, j;
-   int **m = malloc((l+1) * sizeof (int *));
-   for (i = 1; i <= l; ++i) 
-	  m[i] = malloc((c+1) * sizeof (int));
-   for (i = 1; i <= l; ++i)
-	  for (j = 1; j <= c; ++j)
-		 m[i][j] = val;
+/* A função alocaMatriz() aloca, se houver memória disponível, uma matriz
+com linhas 1,2,...,l e colunas 1..c. Cada elemento da matriz recebe valor val. */
+int **alocaMatriz(int l, int c, int val) { 
+   	vertice i, j;
+   	int **m = malloc((l+1) * sizeof (int *));
+   	
+   	if (m == NULL){
+		return NULL;
+	}
+	
+   	for (i = 1; i <= l; ++i){
+		m[i] = malloc((c+1) * sizeof (int));
+		if (m[i] == NULL){
+			for (j = 1; j <= i; ++j){
+				free(m[j]);
+			}
+			free(m);
+			return NULL;
+		}
+	}
+	
+	
+	for (i = 1; i <= l; ++i){
+		for (j = 1; j <= c; ++j){
+			m[i][j] = val;
+		}
+	}
    return m;
 }
 
+
 /* A função inicializaGrafo() constrói um grafo com vértices 1,2,...,V e nenhum arco. */
 Grafo inicializaGrafo(int V) { 
-   Grafo G = malloc(sizeof *G);
-   G->V = V; 
-   G->A = 0;
-   G->adj = alocaMatriz(V, V, INF);
-   return G;
+	Grafo G = malloc(sizeof *G);
+	if(G == NULL){
+		return NULL;
+	}
+	G->V = V; 
+	G->A = 0;
+	G->adj = alocaMatriz(V, V, INF);
+	if(G->adj == NULL){
+		return NULL;
+	}
+	return G;
 }
 
 /* A função insereArco() insere um arco v-w com custo c no grafo G.
-A função supõe que v e w são distintos, positivos e menores que G->V. Se o grafo já tem um arco v-w, a função não faz nada. */
+A função supõe que v e w são distintos, positivos e menores ou iguais a G->V. 
+Se o grafo já tem um arco v-w, a função não faz nada. */
 void insereArco(Grafo G, vertice v, vertice w, int c) { 
-   if (G->adj[v][w] == INF) {
-	  G->adj[v][w] = c; 
-	  G->A++;
-   }
+	if (G->adj[v][w] == INF) {
+		G->adj[v][w] = c; 
+		G->A++;
+	}
 }
 
 
@@ -106,16 +131,19 @@ void mostraGrafo(Grafo G) {
    }
 }
 
-
+/* A função distanciaMinima encontra um vértice da fronteira de Z
+cuja distância à origem seja mínima.*/
 int distanciaMinima(Grafo G, int dist[], int Z[]) 
 { 
-   int minimo = INF, indiceMenorValor; 
-   int v;
-   for (v = 1; v <= G->V; v++) 
-	 if (Z[v] == 0 && dist[v] <= minimo) 
-		 minimo = dist[v], indiceMenorValor = v; 
-   
-   return indiceMenorValor; 
+	int minimo = INF, indiceMenorValor; 
+	vertice v;
+	for (v = 1; v <= G->V; v++){
+		if (Z[v] == 0 && dist[v] <= minimo){
+			minimo = dist[v];
+			indiceMenorValor = v; 
+		}
+	}
+	return indiceMenorValor; 
 } 
    
    
@@ -166,20 +194,13 @@ void Dijkstra(Grafo G, int s, int t)
 	printf("\nO custo mínimo do vértice %d ao vértice %d é: %d\n", s, t, dist[t]);
 	mostraCaminho(anterior, t); 
 	
-	
-	/* Espera o usuario pressionar uma tecla para voltar ao menu principal */
-	printf("\n\n[i] Pressione <ENTER> para voltar ao MENU DE OPCOES...");
-	setbuf(stdin,NULL);
-	getchar();
-	
-
 } 
 
-void leituraArquivo(){
-	/**   Lê o nome do arquivo e, ao localizá-lo, lê o grafo contido no mesmo,
-	 *    bem como os custos de seus arcos, e encontra um caminho de custo mínimo
-		  utilizando o algoritmo de Dijkstra.
-	 */
+
+/*  A funão caminhoMinimo lê o nome de um arquivo e, ao localizá-lo, lê o grafo contido no mesmo,
+bem como os custos de seus arcos, e encontra um caminho de custo mínimo entre um vértice origem
+e um vértice destino utilizando o algoritmo de Dijkstra. */
+void caminhoMinimo(){
 
 	/* Cabeçalho */
 	limpaTela();
@@ -217,7 +238,7 @@ void leituraArquivo(){
 		free(nomeArquivo);
 		printf("\n\n[!] Arquivo não localizado");
 		printf("\n[i] Verifique se o arquivo existe ou se você digitou o nome corretamente");
-		printf("\n\n[i] Pressione <ENTER> para voltar ao MENU DE OPCÕES...");
+		printf("\n\n[i] Pressione <ENTER> para voltar ao MENU DE OPÇÕES...");
 		setbuf(stdin,NULL);
 		getchar();
 
@@ -227,12 +248,19 @@ void leituraArquivo(){
 		printf("\n\tArquivo: %s\t",nomeArquivo);
 
 
-	/*Lê a primeira linha do arquivo, contendo a quantidade de vértices,
+	/* Lê a primeira linha do arquivo, contendo a quantidade de vértices,
 	a quantidade de arcos, o vértice origem e o vértice destino. */
 		fscanf(file,"%d %d %d %d",&vertices, &arcos, &origem, &destino); 
 
 		printf("\nVértices: %d\tArcos: %d\t Origem: %d\t Destino: %d\n", vertices, arcos, origem, destino);
 		G = inicializaGrafo(vertices);
+		if(G == NULL ){ /* Falta de memória */
+            printf("\n[x] Falha! Não há memória disponível no sistema");
+            printf("\n\n[i] Pressione <ENTER> para voltar ao MENU DE OPÇÕES...");
+            setbuf(stdin,NULL);
+            getchar();
+            return;
+        }
 		while(i < arcos){ /* Lê as próximas m linhas contendo os arcos do grafo */
 			/* Lê um arco do grafo */
 			fscanf(file,"%d %d %d",&v, &w, &custo);
@@ -243,21 +271,79 @@ void leituraArquivo(){
 		
 		mostraGrafo(G);
 	   
-		/*chama a função Dijkstra passando o vértice origem e o vértice destino, 
-			o que vai nos devolver o custo mínimo para sair da origem e chegar ao destino. */
+		/* Chama a função Dijkstra passando o grafo G, o vértice origem e o vértice destino. 
+		A função devolve um caminho mínimo para sair da origem e chegar ao destino, 
+		e o custo desse caminho. */
 		Dijkstra(G, origem, destino); 
 
 		fclose(file); //Fecha o arquivo
+		
+		/* Espera o usuario pressionar uma tecla para voltar ao menu principal */
+	    printf("\n\n[i] Pressione <ENTER> para voltar ao MENU DE OPÇÕES...");
+	    setbuf(stdin,NULL);
+	    getchar();
 	}
 }
 
 
-/** FUNÇÃO PRINCIPAL */
+/* A função menuDeOpcoes exibe o menu de opções, lê a opção escolhida pelo usuário e a retorna. */
+char menuDeOpcoes(){
+    
+
+    char opcao;
+
+    //Mostra o menu de opções. Repete o processo enquanto a opção escolhida pelo usuário não for válida.
+    do{
+        //Monta menu.
+        limpaTela();
+        printf("### GRAFOS ###\n\n");
+        printf("### MENU DE OPCOES ###\n\n");
+        printf("C - Caminho mínimo\n");
+        printf("F - Finalizar\n");
+        printf("\n[i] Escolha uma opção acima e pressione <ENTER>: ");
+
+        setbuf(stdin,NULL);
+        opcao = toupper(getchar()); //Lê a opção digitada pelo usuário e a transforma em letra maiúscula.
+
+        /* Exibe aviso de advertência, caso a opção escolhida pelo usuário seja inválida */
+        if((opcao!='C') && (opcao!='F')){
+            printf("#");
+            printf("\n\n[!] Opção inválida\n");
+            printf("[i] Pressione <ENTER> e tente novamente...");
+            setbuf(stdin,NULL);
+            getchar();
+        }
+    //Testa validade. Se a opção escolhida for válida, o laço termina. Caso contrário, mostra o menu novamente.
+    } while((opcao!='C') && (opcao!='F'));
+
+    return opcao;
+} /* Fim menuDeOpcoes() */
+
+
+
+/* FUNÇÃO PRINCIPAL */
 int main(){
 	setlocale(LC_ALL, "portuguese");
 	int finalizarPrograma = 0; //Flag para quando o usuário desejar finalizar o programa.
 	
+	/* Laço do-while: Chama a função 'menuDeOpções' e abre a função correspondente à escolha do usuário.
+     * Repete o processo enquanto o mesmo não desejar finalizar o programa.
+     */
+    do{
+        switch(menuDeOpcoes()){
+            //Opção 'CAMINHO MÍNIMO'
+            case 'C':
+                caminhoMinimo();
+                break;
 
-	leituraArquivo();
+            //Opção 'FINALIZAR'
+            case 'F':
+                printf("Finalizar\n");
+                finalizarPrograma = 1;
+                break;
+        }
+    //Testa validade para saber se o usuário deseja finalizar o programa.
+    } while(!finalizarPrograma);
+
 	return 0;
 } /* Fim main() */
